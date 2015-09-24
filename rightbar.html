@@ -1,0 +1,372 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Untitled Document</title>
+
+
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<script type="text/javascript" src="js/pop-up/jqModal.js"></script>
+
+<script type="text/javascript">
+	
+	$("#right_profile,#user_mail").hide();
+	$('#dialog').jqm();
+	$('#slider').nivoSlider();
+	
+	if($.cookie("loged")){
+			
+		$(".sidebar_right_bottom").hide();
+		$("#right_profile").show();
+		
+		if($.cookie("loged").split("/")[3]=="student"){
+			$("#right_name").html($.cookie("loged").split("/")[0]);
+			$("#right_fname").html($.cookie("loged").split("/")[1]);
+			$("#right_lname").html($.cookie("loged").split("/")[2]);
+				
+			if($.cookie("loged").split("/")[4]=="NULL" || $.cookie("loged").split("/")[4]=="Null" || $.cookie("loged").split("/")[4]=="null")
+				$("#right_status").html("Not Applied");
+			else $("#right_status").html($.cookie("loged").split("/")[4]);
+		}
+		
+		else{
+			$("#status_label,#app_link").hide();
+			$("#right_name").html($.cookie("loged").split("/")[0]);
+			$("#fname_label").html("DEGREE");
+			$("#right_fname").html($.cookie("loged").split("/")[1]);
+			$("#lname_label").html("PROGRAM");
+			$("#right_lname").html($.cookie("loged").split("/")[2]);
+		}
+	}
+	else{
+
+		$("#right_profile").hide();
+		$("#link_profile").hide();	
+	}
+	
+	$("#login_form").on("submit",function(e){
+		e.preventDefault();
+	});
+		
+	$("#login_submit").click(function(){
+
+		if($(this).val()=="Sign In"){
+			if($("#user_name").val() && $("#password").val()){
+				
+				$.ajax({
+					url:"php/check_login.php",
+					data:{user_type:$("#user_type").val(),name:$("#user_name").val(),password:$("#password").val()},
+					type:"POST",
+					dataType:"json",
+					success:function(result){
+						if(result[4]=="Invalid Username or Password"){
+							alert(result[4]);
+							$("#user_name,#password").val("");
+							
+						}
+						else if($("#user_type").val().toLowerCase()=="student"){
+							$.cookie('loged', result[0]+"/"+result[1]+"/"+result[2]+"/"+$("#user_type").val().toLowerCase()+"/"+result[3] , { expires: 1 });
+							location.reload();
+							window.scrollTo(0,0);				
+						}
+						
+						else{
+							$.cookie("loged",result[0]+"/"+result[1]+"/"+result[2]+"/"+$("#user_type").val().toLowerCase()+"/"+result[3],{ expires: 1 });	
+							location.reload();
+							window.scrollTo(0,0);
+						}
+					},
+					error:function(x,e){
+						if(x.status==0){
+							alert('You are offline!!\n Please Check Your Network.');
+						}else if(x.status==404){
+							alert('Requested URL not found.');
+						}else if(x.status==500){
+							alert('Internel Server Error.');
+						}else if(e=='parsererror'){
+							alert('Error.\nParsing JSON Request failed.');
+						}else if(e=='timeout'){
+							alert('Request Time out.');
+						}else {
+							alert('Unknow Error.\n'+x.responseText);
+						}
+					}
+				});
+			}
+		}
+		
+		else if($(this).val()=="Send Mail"){
+			
+			var password = "";
+    		var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@_#$&*";
+
+    		for( var i=0; i < 10; i++ )
+        		password += possible.charAt(Math.floor(Math.random() * possible.length));
+			
+			$.ajax({
+					url:"php/smtp.php",
+					data:{user_type:$("#user_type").val().toLowerCase(),name:$("#user_name").val(),mailid:$("#user_mail").val(),new_password:password},
+					type:"POST",
+					dataType:"json",
+					success:function(result){
+						alert(result);
+						location.reload();
+					},
+					error:function(x,e){
+						alert("Password Sent to your Mail ID");
+						location.reload();
+					}
+				});
+		}
+		
+		else{
+			$.removeCookie("loged");
+			location.reload();	
+		}
+	});
+	
+	$("#logout").click(function(){
+		$.removeCookie("loged");
+		location.reload();	
+	});
+	
+	$("#signup_form").on("submit",function(e){
+		e.preventDefault();
+	});
+	
+	$("#signup").click(function(){
+		
+		if($("#f_name").val() && $("#l_name").val() && $("#dob").val() && $("#contact").val() && $("#email").val() && $("#signup_name").val() && $("#signup_password").val() && $("#retype").val()){
+			
+			var pattern = new RegExp(/^[+a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i);
+			
+			if(pattern.test($("#email").val())){
+				if($("#signup_name").val().length>7){
+					if($("#signup_password").val().length>5){
+						
+						 if($("#retype").val().length>5){
+							if($("#signup_password").val()==$("#retype").val()){
+								
+								$.ajax({
+									url:"php/set_login.php",
+									data:{fname:$("#f_name").val(),lname:$("#l_name").val(),dob:$("#dob").val(),contact:$("#contact").val(),email:$("#email").val(),address:$("#address").val(),user_name:$("#signup_name").val(),password:$("#signup_password").val()},
+									type:"POST",
+									dataType:"json",
+									success:function(result){
+										alert(result);
+										location.reload();
+										window.scrollTo(0,0);
+									},
+									error:function(x,e){
+										if(x.status==0){
+											alert('You are offline!!\n Please Check Your Network.');
+										}else if(x.status==404){
+											alert('Requested URL not found.');
+										}else if(x.status==500){
+											alert('Internel Server Error.');
+										}else if(e=='parsererror'){
+											alert('Error.\nParsing JSON Request failed.');
+										}else if(e=='timeout'){
+											alert('Request Time out.');
+										}else {
+											alert('Unknow Error.\n'+x.responseText);
+										}
+									}
+								});
+								
+							}
+							else{
+								alert("Password Mismatch");	
+								$("#signup_password,#retype").val("")
+							}
+						 }
+						 else{
+							alert("Please Re-type Password");
+							$("#retype").val("");
+						 }
+					}
+					else{
+						alert("Invalid Password");	
+						$("#signup_password,#retype").val("")
+					}
+				}
+				else{
+					alert("Enter ValidUser Name");
+					$("#signup_name").val("");	
+				}
+			}
+			else{
+				alert("Invalid e-Mail Address");
+				$("#email").val("");	 
+			}
+	
+		}
+	});
+	
+	$("#cancel").click(function(){
+		$("#f_name,#l_name,#dob,#contact,#email,#signup_password,#retype").val("")
+	});
+	
+	$("#contact").on("keypress",function(evt){
+		evt = (evt) ? evt : window.event;
+    	var charCode = (evt.which) ? evt.which : evt.keyCode;
+    	if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+    	    return false;
+    	}
+    	return true;
+	});
+	
+	$("#forgot_password").click(function(){
+		
+		if($(this).html()=="Forgot Password ?"){
+			$(this).html("Cancel");
+			$("#login_submit").attr("value","Send Mail");
+			$("#change_label").html("Email");
+			$("#password").hide();
+			$("#user_mail").show();
+		}
+		else{
+			$(this).html("Forgot Password ?");
+			$("#login_submit").attr("value","Sign In");
+			$("#change_label").html("Password");
+			$("#password").show();
+			$("#user_mail").hide();
+		}
+	});
+</script>
+</head>
+
+<body>
+<div class="sidebar">
+        
+        <div class="sidebar_right_bottom">
+        
+        	<h3>USER LOGIN</h3>
+        	<div class="login_form">        		
+        		
+                 <form id="login_form">
+                     <div>
+                        
+                       <span><label>User Name</label></span>
+                       <span><input name="userName" type="text" class="textbox" id="user_name" required ></span>
+                     </div>
+                     <div>
+                       <span><label id="change_label">Password</label></span>
+                       <span><input name="userName" type="password" id="password" required ></span>
+                       <span><input name="userMail" type="text" id="user_mail" required></span>
+                     </div>
+                     <div>
+                       <span><label>User Type</label></span>
+                       <span><select id="user_type"><option>STUDENT</option><option>OTHERS</option></select></span>
+                     </div>
+                      <div>
+                      	 
+                         <span><input type="submit" class="mybutton" value="Sign In" id="login_submit"></span>
+                      </div>
+                      <span><a id="forgot_password" style="cursor:pointer;">Forgot Password ?</a></span>
+                  
+                       <h4>New User <a href="#" class="jqModal">Sign Up Here</a></h4>
+                   </form>
+                   
+                   <div class="jqmWindow" id="dialog" style="padding-left: 12px; padding-right: 12px;">
+
+						<!--<a href="#" class="jqmClose">Cancel</a><br/>-->
+                        <div class="sidebar_right_bottom">
+                        	<h3 style="color:white;">UNCC Sign Up</h3>
+                        </div>
+                        <form id="signup_form">
+                        	<table border="0" style="border-collapse:collapse;border-spacing:0;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline; background: none; width: 96%;"><tr><td style="width: 50%;">
+                                <div>
+                                <span><label>First Name<label style="color:red; margin-left: 5px;">*</label></label></span>
+                                <span><label><input type="text" id="f_name" required placeholder="(eg)Li Tshiang" /></label></span>
+                                </div></td><td>
+                                <div>
+                                <span><label style="margin-left: 10px;">Last Name<label style="color:red; margin-left: 5px;">*</label></label></span>
+                                <span><label><input type="text" id="l_name" required style="margin-left: 10px;" placeholder="(eg)Tsay" /></label></span>
+                                </div></td></tr>
+                            </table>                           
+                                                                
+                            <div>
+							<span><label>Contact<label style="color:red; margin-left: 5px;">*</label></label></span>
+                        	<span><label><input type="text" id="contact" style="width: 47%;" required maxlength="10" placeholder="(eg)7049224873" /></label></span>
+                            </div>
+                            
+                            <div>
+							<span><label>e-mail Address<label style="color:red; margin-left: 5px;">*</label></label></span>
+                        	<span><label><input type="text" id="email" style="width: 47%;" required placeholder="(eg)xnjs@gmail.com"/></label></span>
+                            </div>
+                            
+                            <div>
+							<span><label>Address<label style="color:red; margin-left: 5px;">*</label></label></span>
+                        	<span><label><textarea rows="4" cols="50" id="address" required placeholder="Your Current Residence Address" ></textarea></label></span>
+                            </div>
+                            
+                            <div>
+							<span><label>Date of Birth<label style="color:red; margin-left: 5px;">*</label></label></span>
+                        	<span><label><input type="date" id="dob" required style="width: 47%;" /></label></span>
+                            </div>
+                            
+                            <div>
+							<span><label>User Name<label style="color:red; margin-left: 5px;">*</label></label></span>
+                        	<span><label><input type="text" id="signup_name" style="width: 47%;" required placeholder="Minimum 8 characters" /></span>
+                            </div>
+                            
+                            <table border="0" style="border-collapse:collapse;border-spacing:0;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline; background: none; width: 96%;"><tr><td style="width: 50%;">
+                            <div>
+							<span><label>Password<label style="color:red; margin-left: 5px;">*</label></label></span>
+                        	<span><label><input type="password" id="signup_password" required placeholder="Minimum 6 characters" /></label></span>
+                            </div></td><td>
+                            
+                            <div>
+							<span><label style="margin-left: 10px;">Retype Password<label style="color:red; margin-left: 5px;">*</label></label></span>
+                        	<span><label><input type="password" id="retype" required style="margin-left: 10px;" placeholder="Minimum 6 characters" /></label></span>
+                            </div></td></tr></table>
+                            
+                            
+                            <center><div style="text-align:center"><input type="submit" value="sign up" id="signup" class="mybutton1	" /><input type="button" value="cancel" class="mybutton1 jqmClose" style="margin-left: 15px;" id="cancel"/></div></center>
+                            
+                            
+                        </form>
+						
+
+					</div>
+        	</div>
+            
+         </div>
+         
+         <div class="sidebar_right_bottom" id="right_profile">
+         	<h3>Welcome!!!</h3>   
+            <div class="login_form">	
+            <div>
+            	<span><label>User Name</label></span>
+                <span style="text-align:center; font-weight:bolder;"><label id="right_name"></label></span>
+            </div>
+            
+            <div>
+            	<span><label id="fname_label">First Name</label></span>
+                <span style="text-align:center; font-weight:bolder;"><label id="right_fname"></label></span>
+            </div>
+            
+            <div>
+            	<span><label id="lname_label">Last Name</label></span>
+                <span style="text-align:center; font-weight:bolder;"><label id="right_lname"></label></span>
+            </div>
+            
+            <div>
+            	<span><label id="status_label">Application Status</label></span>
+                <span style="text-align:center; font-weight:bolder; color: red;"><label id="right_status"></label></span>
+            </div>
+            
+            <br/>
+            <div>
+            	<span><input type="submit" class="mybutton" value="Logout" id="logout"></span>
+            </div>
+            
+            <br/>      
+            <h4 id="app_link">View <a href="profile.html">Your Application</a></h4>
+            </div>
+         </div>
+         
+       </div>
+</body>
+</html>

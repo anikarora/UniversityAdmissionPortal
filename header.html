@@ -1,0 +1,67 @@
+<html>
+<head>
+	<title>UNC Charlotte</title>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link href="css/style.css" rel="stylesheet" type="text/css" media="all"/>
+<link href="css/slider.css" rel="stylesheet" type="text/css" media="all"/>
+<link href="css/table.css" rel="stylesheet" type="text/css" media="all"/>
+
+<!-- POP-UP Links-->
+
+<link type="text/css" rel="stylesheet" media="all" href="css/pop-up/jqModal.css" />
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+
+<script type="text/javascript">
+
+	if(!$.cookie("loged")){
+		var id = $.cookie("currentPage");
+		document.getElementById(id).className = "active";
+	}
+	
+	if($.cookie("currentPage")){
+		
+		
+		if($.cookie("loged").split("/")[4]=="ACCEPTED" && $.cookie("loged").split("/")[3]=="student"){
+			
+			$(".menu ul").append("<li id=\"Course\"><a href=\"course.html\">Courses</a></li><li id=\"Scholarship\"><a href=\"scholarship.html\">Scholarship</a></li><li id=\"Housing\"><a href=\"housing.html\">Housing</a></li><li id=\"Job\"><a href=\"applyjob.html\">On Campus Jobs</a></li>");	
+			
+			
+		}
+		
+		else if($.cookie("loged").split("/")[3]=="others"){
+			
+			$(".menu ul").append("<li id=\"Applications\"><a href=\"application.html\">Manage Applications</a></li>");	
+		}
+		
+		var id = $.cookie("currentPage");
+		document.getElementById(id).className = "active";
+    }
+	
+</script>
+
+</head>
+<body>
+	<div class="header">
+		<div class="header_top">
+			<div class="wrap">	 
+				<div class="logo">
+					<a href="index.html"><img src="images/logo.png" alt="" /></a>
+				</div>
+				<div class="menu">
+					<ul>
+						<li id="Home"><a href="index.html">Home</a></li>
+                        <li id="My Profile"><a href="profile.html">My Profile</a></li>
+						<li id="Faculty"><a href="faculty.html">Faculty</a></li>
+						<li id="Programs"><a href="programs.html">Programs</a></li>
+						<li id="Tuition"><a href="tuition.html">Tuition Fee</a></li>
+							
+					</ul>       
+				</div>
+			<div class="clear"></div>
+		</div>
+	</div>
+          
+</body>
+</html>

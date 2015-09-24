@@ -1,0 +1,74 @@
+<!--A Design by W3layouts
+Author: W3layout
+Author URL: http://w3layouts.com
+License: Creative Commons Attribution 3.0 Unported
+License URL: http://creativecommons.org/licenses/by/3.0/
+-->
+<!DOCTYPE HTML>
+<head>
+<title>UNC Charlotte</title>
+
+<script type="text/javascript" src="js/jquery-1.9.0.min.js"></script>
+<script type="text/javascript" src="js/jquery.nivo.slider.js"></script>
+<script type="text/javascript" src="js/applyhousingjs.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+
+<script> 
+    $(function(){
+		if(!$.cookie("loged"))
+			window.location="index.html";
+		else{
+	  		$.cookie("currentPage","Housing",{expires: 1});
+      		$.ajax({
+				url: "header.html",
+				success: function (data) { $('body').prepend(data); },
+				dataType: 'html'
+			  });
+			  
+			  $.ajax({
+				url: "footer.html",
+				success: function (data) { $('body').append(data); },
+				dataType: 'html'
+			  });
+			  
+			  $("#leftbar").load("leftbar.html");
+			  $("#rightbar").load("rightbar.html"); 
+		}
+    });
+</script> 
+    
+</head>
+<body>
+	<div id="headerpart">
+	      	
+	</div>
+	  <div class="main">  
+	   <div class="wrap">  		 
+	       <div id="leftbar">
+	    		 
+	  		</div> 
+       <div class="content">
+		      <div class="content_bottom">
+              		<center><h3>UNCC On-Campus Housing</h3></center>
+              		<select id="location" style="padding-left: 10px; width: 33%;"><option>All</option></select>
+                    <select id="rate"  style="padding-left: 10px; width: 32%;">
+                    	<option>All</option>
+                    	<option>100 $ - 500 $</option>
+                        <option>500 $ - 1000 $</option>
+                        <option>1000 $ - 1500 $</option>
+                    </select>
+                    <select id="bhk"  style="padding-left: 10px; width: 33%;"><option>All</option></select>
+		      		<table style="border: 1px solid black;" class="custom_table" id="house_table">
+                    	<thead><tr><th>Location</th><th>BHK</th><th>Rent($/Month)</th><th></th></tr></thead>
+                       
+                    </table>
+		      </div>
+    	</div>
+   <div id="rightbar"></div>
+    <div class="clear"></div>
+ </div>
+</div>
+   
+</body>
+</html>
+
